@@ -45,7 +45,7 @@ python database.py
 # 4. 啟動 Streamlit Web App
 streamlit run app.py
 ```
-开启瀏覽器前往 `http://localhost:8501` 即可查看作業成果。即使未開啟 Part B，Part A 的選單、SQLite 折線圖與 Folium 台灣地圖均可完整獨立運作。
+開啟瀏覽器前往 `http://localhost:8501` 即可查看作業成果。即使未開啟 Part B，Part A 的選單、SQLite 折線圖與 Folium 台灣地圖均可完整獨立運作。
 
 ---
 
@@ -73,6 +73,23 @@ streamlit run app.py
 
 ---
 
+## 🤖 AI Agent 自動化部署與檢測 (AI Agent Auto-Deployment)
+
+本專案提供供 **AI Coding Agent (如 Antigravity, Claude Code, Cursor, Devin, Windsurf 等)** 自動讀取與執行的部署規範與起飛檢查腳本：
+
+1. **部署規範指南**：詳細機器可讀指令請參考 **[DEPLOY.md](DEPLOY.md)**。
+2. **自動起飛檢查 (Pre-flight Inspection)**：
+   任何 Agent 可直接執行以下腳本驗證環境、測試資料管道 (確認 `data.db` 42 筆記錄) 並檢查 Git 金鑰安全：
+   ```bash
+   python scripts/deploy_check.py
+   ```
+3. **自動觸發雲端部署 (Render Deploy Hook)**：
+   ```bash
+   python scripts/deploy_check.py --trigger-render
+   ```
+
+---
+
 ## 📂 專案架構說明
 
 - `fetch_weather.py`：使用 `requests` 加載 headers Authorization 取得 CWA API 資料並儲存原始 JSON。
@@ -81,3 +98,7 @@ streamlit run app.py
 - `app.py`：Streamlit Web App 主程式，由 SQLite 進行 SQL 參數化查詢，提供互動圖表、Folium 地圖與可選的 Windy 整合。
 - `backend/`：FastAPI 後端，負責 CWA 自動氣象站 (O-A0001-001) 即時資料與歷史快照 (`history.db`)。
 - `frontend/`：Vite + React 前端，負責 Windy 地圖、Leaflet 測站圖層與時間滑桿。
+- `DEPLOY.md`：AI Agent 自動化部署與起飛檢查規範指南。
+- `scripts/deploy_check.py`：AI Agent 自動檢查與部署觸發腳本。
+- `render.yaml`：Render 雲端部署 Infrastructure-as-Code Blueprint 設定檔。
+- `完整對話.md`：本專案所有開發、問答與優化歷程完整對話紀錄。
