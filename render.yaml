@@ -1,0 +1,35 @@
+services:
+  # 1. Streamlit Web App (Part A)
+  - type: web
+    name: hw1-cwa-streamlit
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: python fetch_weather.py && python parse_weather.py && python database.py && streamlit run app.py --server.port $PORT --server.address 0.0.0.0
+    envVars:
+      - key: CWA_API_KEY
+        sync: false
+      - key: PYTHON_VERSION
+        value: 3.11.8
+
+  # 2. FastAPI Backend (Part B API)
+  - type: web
+    name: hw1-cwa-fastapi-backend
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn backend.app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: CWA_API_KEY
+        sync: false
+      - key: PYTHON_VERSION
+        value: 3.11.8
+
+  # 3. React Frontend Static Site (Part B Frontend)
+  - type: static
+    name: hw1-cwa-react-frontend
+    buildCommand: cd frontend && npm install && npm run build
+    staticPublishPath: ./frontend/dist
+    envVars:
+      - key: VITE_API_BASE_URL
+        sync: false
+      - key: VITE_WINDY_API_KEY
+        sync: false

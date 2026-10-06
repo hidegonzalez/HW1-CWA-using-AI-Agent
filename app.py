@@ -8,6 +8,7 @@
 
 所有預報數據都從 data.db 以 SQL 查詢，不直接呼叫 API。
 """
+import os
 import socket
 import sqlite3
 
@@ -18,7 +19,21 @@ import streamlit as st
 import streamlit.components.v1 as components
 
 DB_PATH = "data.db"
-WINDY_FRONTEND = ("localhost", 5173)
+WINDY_FRONTEND_URL = os.getenv("WINDY_FRONTEND_URL", "http://localhost:5173")
+
+# 如果雲端部署時尚無 data.db，自動執行資料管道產生
+if not os.path.exists(DB_PATH):
+    try:
+        import fetch_weather, parse_weather, database
+        fetch_weather.main()
+        parse_weather.parse_weather()
+        _conn = database.init_db()
+        database.populate_db(_conn)
+        _conn.close()
+    except Exception as _e:
+        print(f"Auto DB init warning: {_e}")
+
+REGIONS_HOST_PORT = ("localhost", 5173)
 
 REGION_ORDER = ["北部地區", "中部地區", "南部地區", "東北部地區", "東部地區", "東南部地區"]
 
@@ -133,8 +148,10 @@ def get_day_all_regions(date: str) -> pd.DataFrame:
 
 
 def windy_running() -> bool:
+    if "localhost" not in WINDY_FRONTEND_URL and "127.0.0.1" not in WINDY_FRONTEND_URL:
+        return True
     try:
-        with socket.create_connection(WINDY_FRONTEND, timeout=0.3):
+        with socket.create_connection(REGIONS_HOST_PORT, timeout=0.3):
             return True
     except OSError:
         return False
@@ -283,7 +300,8 @@ with main:
 with map_container:
     if windy_running():
         target = WINDY_VIEW.get(selected_region, TAIWAN_VIEW)
-        url = f"http://localhost:5173?lat={target['lat']}&lon={target['lon']}&zoom={target['zoom']}"
+        base_url = WINDY_FRONTEND_URL.rstrip('/')
+        url = f"{base_url}?lat={target['lat']}&lon={target['lon']}&zoom={target['zoom']}"
         if selected_date:
             url += f"&time={selected_date}"
         components.iframe(url, height=750, scrolling=False)
