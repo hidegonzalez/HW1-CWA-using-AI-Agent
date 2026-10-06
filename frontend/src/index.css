@@ -1,0 +1,53 @@
+@import "tailwindcss";
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+#windy {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+}
+
+#root {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  pointer-events: none; /* Let clicks pass through to map by default */
+}
+
+/* Re-enable pointer events for React UI components */
+.ui-layer {
+  pointer-events: auto;
+}
+
+.leaflet-popup-content-wrapper {
+  background: rgba(25, 25, 25, 0.9) !important;
+  color: white !important;
+  border-radius: 8px !important;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+}
+.leaflet-popup-tip {
+  background: rgba(25, 25, 25, 0.9) !important;
+}
+
+/* Hide Windy built-in city labels to keep the screen clean */
+.leaflet-labels-pane,
+.weather-labels,
+.windy-labels,
+.leaflet-pane.leaflet-labels-pane {
+  display: none !important;
+}
